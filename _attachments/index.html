@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dot Logging - CouchApp</title>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.css" />
+	<script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.js"></script>
+	<script src="js/jquery.flot.min.js"></script>
+	<script src="/_utils/script/json2.js"></script>
+  </head>
+  <body>
+	<div data-role="page" id="top">
+		<div data-role="header">
+			<h1 id="dot_logging_-_top">Dot Logging - Top</h1>
+		</div>
+		<div data-role="content">
+			<p>let's log dots.</p>
+			<a href="#logdot">dot.</a><br>
+			<a href="#graph">View Graph</a><br>
+		</div>
+		<div data-role="footer">
+			Dot Logging
+		</div>
+	</div>
+	<div data-role="page" id="logdot">
+		<div data-role="header">
+			<h1 id="dot_logging_-_logdot">Dot Logging - logdot</h1>
+		</div>
+		<div data-role="content">
+			<p>Push button if you log the dot.</p>
+			<input type="submit" name="postdot" value="dot!" id="postdot"><br>
+			<span id="dotmsg"></span>
+		</div>
+		<div data-role="footer">
+			Dot Logging
+		</div>
+	</div>
+	<div data-role="page" id="graph">
+		<div data-role="header">
+			<h1 id="dot_logging_-_graph">Dot Logging - Graph</h1>
+		</div>
+		<div data-role="content">
+			<div id="placeholder" style="width:500px;height:250px;"></div> 
+			<br><input type="button" id="plotgraph" value="replot"><br>
+		</div>
+		<div data-role="footer">
+			Dot Logging
+		</div>	
+	</div>
+  </body>
+
+<script id="source"> 
+$(function () {
+	// plot graph
+	plot_Graph();
+	
+	// bind post function to dot
+	$("#postdot").click(function(){
+		var json = {"stime":null, "type":"cough"};
+		var d = new Date();
+		json.stime = d.getTime();
+		$.ajax({
+			type: 'POST',
+			dataType: 'json',
+			url: "/dots/",
+			contentType: 'application/json',
+			data: JSON.stringify(json),
+			processData: false,		
+			success: function(data, dataType){
+				//alert("ok post");
+				$("#dotmsg").text("post ok("+data.ok+") dot as "+data.id);
+			},
+			error: function(msg){
+				alert("Failed.");
+			}
+		});
+	});
+	
+	$("#plotgraph").click(function(){
+		plot_Graph();
+	});
+});
+
+function plot_Graph(){
+	var datasets = [];
+	var tempd = [];
+	
+	$.ajax({
+		type: 'GET',
+		dataType: 'json',
+		url: "/dots/_design/dotlgng/_view/cough-day?group=true&group_level=4",
+		success: function(data){
+			$.each(data.rows, function(id, val){
+				var tmp = [val.value.stime, val.value.count];
+				tempd.push(tmp);
+			});
+			// fix to JST
+			for(var i = 0; i < tempd.length ; i ++ ) {
+				tempd[i][0] = tempd[i][0] + 32400000;
+			}
+			datasets.push({"label":"cough",data:tempd});
+			
+			// helper for returning the weekends in a period
+		    function weekendAreas(axes) {
+		        var markings = [];
+		        var d = new Date(axes.xaxis.min);
+		        // go to the first Saturday
+		        d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 1) % 7))
+		        d.setUTCSeconds(0);
+		        d.setUTCMinutes(0);
+		        d.setUTCHours(0);
+		        var i = d.getTime();
+		        do {
+		            // when we don't set yaxis, the rectangle automatically
+		            // extends to infinity upwards and downwards
+		            markings.push({ xaxis: { from: i, to: i + 1 * 24 * 60 * 60 * 1000} });
+		            i += 1 * 24 * 60 * 60 * 1000;
+		        } while (i < axes.xaxis.max);
+
+		        return markings;
+		    }
+			
+			var options = {
+		        xaxis: { mode: "time" },
+		        selection: { mode: "x" },
+		        grid: { markings: weekendAreas },
+				yaxis: { min: 0 },
+            	legend: { position: 'sw' },
+				series: {
+					bars: { show: true, barWidth: 0.6 }
+				}
+		    };
+			
+			$.plot($("#placeholder"), datasets, options);
+		}
+	});
+}
+</script>
+
+</html>
