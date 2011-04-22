@@ -15,8 +15,10 @@
 		</div>
 		<div data-role="content">
 			<p>let's log dots.</p>
-			<a href="#logdot">dot.</a><br>
-			<a href="#graph">View Graph</a><br>
+			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="b">
+				<li><a href="#logdot">dot.</a></li>
+				<li><a href="#graph-top">View Graph</a></li>
+			</ul>
 		</div>
 		<div data-role="footer">
 			Dot Logging
@@ -35,13 +37,40 @@
 			Dot Logging
 		</div>
 	</div>
-	<div data-role="page" id="graph">
+	<div data-role="page" id="graph-top">
 		<div data-role="header">
 			<h1 id="dot_logging_-_graph">Dot Logging - Graph</h1>
 		</div>
 		<div data-role="content">
-			<div id="placeholder" style="width:500px;height:250px;"></div> 
-			<br><input type="button" id="plotgraph" value="replot"><br>
+			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="b">
+				<li data-role="list-divider">Graph Range</li>
+				<li><a href="#graph-today">Today</a></li>
+				<li><a href="#graph-all">All data</a></li>
+			</ul>
+		</div>
+		<div data-role="footer">
+			Dot Logging
+		</div>	
+	</div>
+	<div data-role="page" id="graph-today">
+		<div data-role="header">
+			<h1 id="dot_logging_-_graph">Dot Logging - Graph Today</h1>
+		</div>
+		<div data-role="content">
+			<div id="placeholder-today" style="width:500px;height:250px;"></div> 
+			<br><input type="button" id="plotgraph-today" value="replot"><br>
+		</div>
+		<div data-role="footer">
+			Dot Logging
+		</div>	
+	</div>
+	<div data-role="page" id="graph-all">
+		<div data-role="header">
+			<h1 id="dot_logging_-_graph">Dot Logging - Graph All</h1>
+		</div>
+		<div data-role="content">
+			<div id="placeholder-all" style="width:500px;height:250px;"></div> 
+			<br><input type="button" id="plotgraph-all" value="replot"><br>
 		</div>
 		<div data-role="footer">
 			Dot Logging
@@ -52,7 +81,8 @@
 <script id="source"> 
 $(function () {
 	// plot graph
-	plot_Graph();
+	plot_GraphAll();
+	plot_GraphToday();
 	
 	// bind post function to dot
 	$("#postdot").click(function(){
@@ -76,30 +106,78 @@ $(function () {
 		});
 	});
 	
-	$("#plotgraph").click(function(){
-		plot_Graph();
+	$("#plotgraph-all").click(function(){
+		plot_GraphAll();
+	});
+	$("#plotgraph-today").click(function(){
+		plot_GraphToday();
 	});
 });
 
-function plot_Graph(){
+function plot_GraphAll(){
+	plot_Graph("cough",4,"placeholder-all");
+}
+
+function plot_GraphToday(){
+	var d = new Date();
+	var daybase = "["+d.getFullYear()+","+(d.getMonth()+1)+","+d.getDate();
+	var startkeystr = daybase + ",0]";
+	var endkeystr = daybase + ",23]";
+	plot_Graph("cough",4,"placeholder-today",startkeystr, endkeystr );
+}
+
+function plot_Graph(type,level,plotto,startkey,endkey){
 	var datasets = [];
-	var tempd = [];
+	var tempd = {};
+	
+	// set default params
+	var _type = "all";
+	var _level = 5;
+	var _plotto = "placeholder";
+	var _startkey = "";
+	var _endkey = "";
+
+	if ( null !== type && undefined !== type ) {
+		_type = type;
+	}
+	if ( null !== level && undefined !== level ) {
+		_level = level;
+	}
+	if ( null !== plotto && undefined !== plotto ) {
+		_plotto = plotto;
+	}
+	if ( null !== startkey && undefined !== startkey ) {
+		_startkey = "&startkey="+startkey;
+	}
+	if ( null !== endkey && undefined !== endkey ) {
+		_endkey = "&endkey="+endkey;
+	}
+	
+	// generate uri
+	var uri = "/dots/_design/dotlgng/_view/"+_type+"?group=true&group_level="+_level+_startkey+_endkey;
 	
 	$.ajax({
 		type: 'GET',
 		dataType: 'json',
-		url: "/dots/_design/dotlgng/_view/cough-day?group=true&group_level=4",
+		url: uri,
 		success: function(data){
 			$.each(data.rows, function(id, val){
-				var tmp = [val.value.stime, val.value.count];
-				tempd.push(tmp);
+				var stime = val.value.stime;
+				stime = stime + 32400000; //fix to JST , this is temporary code.
+				var count = val.value.count;
+				
+				// create array for dataset
+				if ( !tempd[_type] ) {
+					tempd[_type] = [];
+				}
+				tempd[_type].push([stime,count]);
 			});
-			// fix to JST
-			for(var i = 0; i < tempd.length ; i ++ ) {
-				tempd[i][0] = tempd[i][0] + 32400000;
-			}
-			datasets.push({"label":"cough",data:tempd});
 			
+			// push all data
+			$.each(tempd, function(type, dataset){
+				datasets.push({"label":type,data:dataset});				
+			});
+
 			// helper for returning the weekends in a period
 		    function weekendAreas(axes) {
 		        var markings = [];
@@ -131,7 +209,7 @@ function plot_Graph(){
 				}
 		    };
 			
-			$.plot($("#placeholder"), datasets, options);
+			$.plot($("#"+_plotto), datasets, options);
 		}
 	});
 }
