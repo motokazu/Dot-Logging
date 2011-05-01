@@ -14,7 +14,7 @@ $(function () {
 
 	// bind post function to dot
 	$("#postdot").click(function(){
-		var json = {"stime":null, "type":"cough"};
+		var json = {"stime":null, "type":"dot"};
 		var d = new Date();
 		json.stime = d.getTime();
 		$.ajax({
@@ -43,7 +43,7 @@ $(function () {
 });
 
 function plot_GraphAll(){
-	jqplot_Graph("all",4,"chartdiv-all");
+	jqplot_Graph("dot",4,"chartdiv-all");
 }
 
 function plot_GraphToday(){
@@ -51,7 +51,7 @@ function plot_GraphToday(){
 	var daybase = "["+d.getFullYear()+","+(d.getMonth()+1)+","+d.getDate();
 	var startkeystr = daybase + ",0]";
 	var endkeystr = daybase + ",23]";
-	jqplot_Graph("all",4,"chartdiv-today",startkeystr, endkeystr );
+	jqplot_Graph("dot",4,"chartdiv-today",startkeystr, endkeystr );
 }
 
 function jqplot_Graph(type,level,plotto,startkey,endkey){
