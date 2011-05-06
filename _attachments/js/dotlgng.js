@@ -118,7 +118,6 @@ function jqplot_Graph(type,level,plotto,startkey,endkey){
 			
 			$.each(data.rows, function(id, val){
 				var stime = val.value.stime;
-				stime = stime + 32400000; //fix to JST , this is temporary code.
 				var count = val.value.count;
 				var d = new Date();
 				d.setTime(stime); // fix to JST

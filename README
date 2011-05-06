@@ -1,5 +1,14 @@
 # Dot Logging  - couchapp to count life events.
 
+## Install
+ 1. install couchdb or couchbase server.
+ 2. install couchapp from https://github.com/couchapp/couchapp
+ 3. git clone git://github.com/motokazu/Dot-Logging.git
+ 4. cd Dot-Logging
+ 5. couchapp push http://localhost:5984/dots
+ 6. open browser and access to http://localhost:5984/dots/_design/dotlgng/index.html
+
+
 ## The following packages are included in this application.
  - jQuery 1.5.2 (http://code.jquery.com/jquery-1.5.2.min.js)
  - jQuery.mobile 1.0a4.1 (http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.js)
