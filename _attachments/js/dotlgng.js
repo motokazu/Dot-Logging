@@ -11,7 +11,10 @@ $(function () {
 	$("#graph-today").bind('pageshow', function(){
 		plot_GraphToday();
 	});
-
+	$("#graph-month").bind('pageshow', function(){
+		plot_GraphMonth();
+	});
+	
 	// bind post function to dot
 	$("#postdot").click(function(){
 		var json = {"stime":null, "type":"dot"};
@@ -20,7 +23,7 @@ $(function () {
 		$.ajax({
 			type: 'POST',
 			dataType: 'json',
-			url: "/dots/",
+			url: "../../",
 			contentType: 'application/json',
 			data: JSON.stringify(json),
 			processData: false,		
@@ -40,10 +43,17 @@ $(function () {
 	$("#replot-today").click(function(){
 		plot_GraphToday();
 	});
+	$("#replot-month").click(function(){
+		plot_GraphMonth();
+	});
 });
 
 function plot_GraphAll(){
 	jqplot_Graph("dot",4,"chartdiv-all");
+}
+
+function plot_GraphMonth(){
+	jqplot_Graph("dot",3,"chartdiv-month");
 }
 
 function plot_GraphToday(){
@@ -51,7 +61,7 @@ function plot_GraphToday(){
 	var daybase = "["+d.getFullYear()+","+(d.getMonth()+1)+","+d.getDate();
 	var startkeystr = daybase + ",0]";
 	var endkeystr = daybase + ",23]";
-	jqplot_Graph("dot",4,"chartdiv-today",startkeystr, endkeystr );
+	jqplot_Graph("dot",5,"chartdiv-today",startkeystr, endkeystr );
 }
 
 function jqplot_Graph(type,level,plotto,startkey,endkey){
@@ -64,6 +74,7 @@ function jqplot_Graph(type,level,plotto,startkey,endkey){
 	var _plotto = "placeholder";
 	var _startkey = "";
 	var _endkey = "";
+	var _format_option = "%b %#d %H:%M"; // for today
 
 	if ( null !== type && undefined !== type ) {
 		_type = type;
@@ -82,13 +93,29 @@ function jqplot_Graph(type,level,plotto,startkey,endkey){
 	}
 	
 	// generate uri
-	var uri = "/dots/_design/dotlgng/_view/"+_type+"?group=true&group_level="+_level+_startkey+_endkey;
+	var uri = "_view/"+_type+"?group=true&group_level="+_level+_startkey+_endkey;
+	
+	// clear plot space
+	$("#"+_plotto).text("");
+	
+	// format option
+	if ( _level == 3 ) {
+		_format_option = "%b %#d, %y";
+	} else if ( _level == 4 ) {
+		_format_option = "%b %#d, %y";
+	}
+	
 	
 	$.ajax({
 		type: 'GET',
 		dataType: 'json',
 		url: uri,
 		success: function(data){
+			if (data.rows.length == 0){
+				$("#"+_plotto).text("No data");
+				return ;
+			}
+			
 			$.each(data.rows, function(id, val){
 				var stime = val.value.stime;
 				stime = stime + 32400000; //fix to JST , this is temporary code.
@@ -96,7 +123,7 @@ function jqplot_Graph(type,level,plotto,startkey,endkey){
 				var d = new Date();
 				d.setTime(stime); // fix to JST
 				//var timekey = d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()+" "+d.getHours()+":"+d.getMinutes();
-				var timekey = d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate();
+				var timekey = d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()+" "+d.getHours()+":"+d.getMinutes();
 				// create array for dataset
 				if ( !tempd[_type] ) {
 					tempd[_type] = [];
@@ -125,13 +152,16 @@ function jqplot_Graph(type,level,plotto,startkey,endkey){
 				series: serieslabels,
 				axes:{
 					xaxis : { renderer: $.jqplot.DateAxisRenderer,
-							tickOptions:{formatString:'%b %#d, %y'}
+							tickOptions:{formatString:_format_option}
 						},
 					yaxis : { min:0 }
 				}
 		    };
 
 			$.jqplot(_plotto, datasets, options );			
+		},
+		error : function(data){
+			$("#"+_plotto).text("Error getting data.");
 		}
 	});
 }

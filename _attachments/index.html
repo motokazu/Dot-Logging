@@ -49,6 +49,7 @@
 			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="b">
 				<li data-role="list-divider">Graph Range</li>
 				<li><a href="#graph-today">Today</a></li>
+				<li><a href="#graph-month">Month</a></li>
 				<li><a href="#graph-all">All data</a></li>
 			</ul>
 		</div>
@@ -63,6 +64,18 @@
 		<div data-role="content">
 			<div id="chartdiv-today" style="widt100%;height:250px;"></div> 
 			<br><input type="button" id="replot-today" value="replot"><br>
+		</div>
+		<div data-role="footer">
+			Dot Logging
+		</div>	
+	</div>
+	<div data-role="page" id="graph-month">
+		<div data-role="header">
+			<h1 id="dot_logging_-_graph">Dot Logging - Graph Month</h1>
+		</div>
+		<div data-role="content">
+			<div id="chartdiv-month" style="widt100%;height:250px;"></div>
+			<br><input type="button" id="replot-month" value="replot"><br>
 		</div>
 		<div data-role="footer">
 			Dot Logging
