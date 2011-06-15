@@ -13,10 +13,11 @@
 * Dot Logging 
 ** install application to couchdb
 1. git clone git://github.com/motokazu/Dot-Logging.git
-2. cd Dot-Logging
+2. cd Dot-Logging/couchapp
 3. couchapp push http://localhost:5984/dots
 4. open browser and access to http://localhost:5984/dots/_design/dotlgng/index.html
 
+**
 * Dot Logging for Android
 *  This application depend to libcouch-android library from https://github.com/couchone/libcouch-android.
 
@@ -26,6 +27,8 @@
 2. setup libcouch-android. (Please reference to http://arandomurl.com/2011/02/13/developing-with-couchdb-on-android.html.)
 
 - build application
-1. open project from DotLoggingAndroid.
-2. export Android application (apk).
-
+1. import src/info/mtkz/android/dotlogging/DotLoggingAndroid.java to src.
+2. import assets/dotlgng.json to assets.
+3. (option) import images (drawable-*) to res.
+4. overwrite Android Manifest file from AndroidManifest.xml.
+5. export Android application (apk).
