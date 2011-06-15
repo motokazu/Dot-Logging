@@ -1,17 +1,31 @@
-# Dot Logging  - couchapp to count life events.
+#
+# Dot Logging  - count life events.
+#  This application based CouchApp. (http://couchapp.org/)
+#
 
-## Install
- 1. install couchdb or couchbase server.
- 2. install couchapp from https://github.com/couchapp/couchapp
- 3. git clone git://github.com/motokazu/Dot-Logging.git
- 4. cd Dot-Logging
- 5. couchapp push http://localhost:5984/dots
- 6. open browser and access to http://localhost:5984/dots/_design/dotlgng/index.html
-
-
-## The following packages are included in this application.
+* Requirements
  - jQuery 1.5.2 (http://code.jquery.com/jquery-1.5.2.min.js)
  - jQuery.mobile 1.0a4.1 (http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.js)
  - jQuery.mobile CSS (http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.css)
  - jqPlot 1.0.0a_r701
  - jqPlot CSS
+
+* Dot Logging 
+** install application to couchdb
+1. git clone git://github.com/motokazu/Dot-Logging.git
+2. cd Dot-Logging
+3. couchapp push http://localhost:5984/dots
+4. open browser and access to http://localhost:5984/dots/_design/dotlgng/index.html
+
+* Dot Logging for Android
+*  This application depend to libcouch-android library from https://github.com/couchone/libcouch-android.
+
+** Build Android Application
+- prepare environment
+1. download eclipse from http://www.eclipse.org/ and setup.
+2. setup libcouch-android. (Please reference to http://arandomurl.com/2011/02/13/developing-with-couchdb-on-android.html.)
+
+- build application
+1. open project from DotLoggingAndroid.
+2. export Android application (apk).
+
