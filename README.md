@@ -18,8 +18,7 @@ push App to your CouchDB Server by CouchApp command line.
 	couchapp push http://localhost:5984/dots
 
 browse application:
-
-	open browser and access to http://localhost:5984/dots/_design/dotlgng/index.html
+open browser and access to http://localhost:5984/dots/_design/dotlgng/index.html
 
 
 ## Dot-Logging for Android
@@ -31,8 +30,7 @@ This application depend to libcouch-android library from https://github.com/couc
 download eclipse and setup. from [Eclipse.org](http://www.eclipse.org)
 
 setup libcouch-android:
-
-	Please reference to http://arandomurl.com/2011/02/13/developing-with-couchdb-on-android.html
+Please reference to http://arandomurl.com/2011/02/13/developing-with-couchdb-on-android.html
 
 
 ### build application
